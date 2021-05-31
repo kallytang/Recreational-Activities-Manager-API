@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+          integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="static/index.css"/>
+</head>
+<body>
+<h1>Welcome</h1>
+
+<h2>Assignment 7 </h2>
+<div id="container_sign_in">
+    <div id="form_sign_in">
+        <h3 id="sign_in_header">Sign In</h3>
+        <fieldset>
+            <form method="post" action="{{ url_for('login_user_page') }}">
+                <div class="form-group">
+                    <label>Email address</label>
+                    <input type="email" class="form-control" id="username" name="username" aria-describedby="emailHelp"
+                           placeholder="Enter email">
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                </div>
+                <button type="submit" class="btn btn-info">Login</button>
+            </form>
+        </fieldset>
+
+
+    </div>
+</div>
+{#reference from bootstrap#}
+<h6 id="header_to_sign_up">If you don't have an account yet, sign up with the button below</h6>
+<button id="sign_up_button" type="button" class="btn btn-info" onclick="window.location.href='{{url_for( 'ui_login')}}';">SignUp</button>
+
+
+
+
+</body>
+</html>
