@@ -25,17 +25,23 @@ from six.moves.urllib.parse import urlencode
 from auth_helper import *
 from constants import *
 
+import attendee
+import activity
+
 app = Flask(__name__)
 app.secret_key = 'SECRET_KEY'
 
 client = datastore.Client()
 
-
+app.register_blueprint(attendee.bp)
+# import bp from auth_helper file
+app.register_blueprint(bp)
+app.register_blueprint(activity.bp)
 
 CALLBACK_URL = 'http://localhost:8080/callback'
 # CALLBACK_URL = 'https://hw7-tangka.wl.r.appspot.com/callback'
 
-ALGORITHMS = ["RS256"]
+
 
 oauth = OAuth(app)
 
