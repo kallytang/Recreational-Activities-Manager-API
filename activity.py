@@ -6,10 +6,9 @@ import json
 from datetime import datetime
 import constants
 
-bp = Blueprint('load', __name__, url_prefix='/loads')
+bp = Blueprint('activities', __name__, url_prefix='/activities')
 
 bp.route("", strict_slashes=False)
 
 client = datastore.Client()
 
-bp.route("/")
