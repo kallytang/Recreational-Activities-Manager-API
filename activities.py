@@ -11,3 +11,5 @@ bp = Blueprint('load', __name__, url_prefix='/loads')
 bp.route("", strict_slashes=False)
 
 client = datastore.Client()
+
+bp.route("/")
