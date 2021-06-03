@@ -13,7 +13,9 @@ client = datastore.Client()
 
 @bp.route("/", methods=['POST', 'GET'],  strict_slashes=False)
 def get_post_attendees():
+    # if request.method == 'POST':
     return 0
+
 
 
 

@@ -42,7 +42,6 @@ CALLBACK_URL = 'http://localhost:8080/callback'
 # CALLBACK_URL = 'https://hw7-tangka.wl.r.appspot.com/callback'
 
 
-
 oauth = OAuth(app)
 
 auth0 = oauth.register(
@@ -58,10 +57,10 @@ auth0 = oauth.register(
 )
 
 
-
 @app.route('/')
 def index():
     return render_template('index.html')
+
 
 @app.route('/logout')
 def logout():
@@ -123,6 +122,30 @@ def ui_login():
     return auth0.authorize_redirect(redirect_uri=CALLBACK_URL)
 
 
+@app.route('/login', methods=['POST'])
+def login_user():
+    content = request.get_json()
+    username = content["username"]
+    password = content["password"]
+    body = {'grant_type': 'password', 'username': username,
+            'password': password,
+            'client_id': CLIENT_ID,
+            'client_secret': CLIENT_SECRET
+            }
+    headers = {'content-type': 'application/json'}
+    url = 'https://' + DOMAIN + '/oauth/token'
+    r = requests.post(url, json=body, headers=headers)
+    return r.text, 200, {'Content-Type': 'application/json'}
+
+
+@app.route('/delete_all')
+def delete_all_entities():
+    query1 = client.query(kind=ACTIVITIES)
+
+    result1 = list(query1.fetch())
+    for item in result1:
+        client.delete(item.key)
+    return "ok"
 
 
 if __name__ == '__main__':
