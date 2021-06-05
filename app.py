@@ -141,12 +141,19 @@ def login_user():
 @app.route('/delete_all')
 def delete_all_entities():
     query1 = client.query(kind=ACTIVITIES)
-
+    query2 = client.query(kind=ATTENDEES)
     result1 = list(query1.fetch())
+    result2 = list(query2.fetch())
     for item in result1:
         client.delete(item.key)
+
+    for att in result2:
+        client.delete(att.key)
     return "ok"
 
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)
+
+
+# https://auth0.com/docs/users/user-search/retrieve-users-with-get-users-endpoint

@@ -23,10 +23,9 @@ def validate_activity_name(name: str):
     name_string = name.replace(" ", "")
     name_string = name_string.replace("-", "")
     name_string = name_string.replace("-", "")
-    if name_string:
-        for letter in name_string:
-            if not letter.isalpha() and not letter.isdigit():
-                return False
+    if len(name_string)==0:
+        return False
+
 
     return True
 

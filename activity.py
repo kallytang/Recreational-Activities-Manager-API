@@ -51,9 +51,6 @@ def get_post_activities():
                     content[NAME] = content[NAME].strip()
                     content[DESCRIPTION] = content[DESCRIPTION].strip()
 
-                    #  check if name of class has only letters, numbers, spaces and dashes
-                    if validate_activity_name(content[NAME]) is False:
-                        return send_json_msg(INVALID_ACTIVITY_NAME, 400, APPLICATION_JSON)
                     #   check if length of name is
                     if validate_length(5, 30, content[NAME]) is False:
                         return send_json_msg(INVALID_NAME_LENGTH, 400, APPLICATION_JSON)
@@ -69,7 +66,7 @@ def get_post_activities():
                         return send_json_msg(INVALID_ROOM_NUMBER, 403, APPLICATION_JSON)
                     # check if start is less than end
 
-                    if room_available( content[ROOM], content[START], content[END]) is False:
+                    if room_available(content[ROOM], content[START], content[END]) is False:
                         return send_json_msg(ROOM_OVERLAP, 403, APPLICATION_JSON)
 
                     post_activity = datastore.entity.Entity(key=client.key(ACTIVITIES))
@@ -94,22 +91,24 @@ def get_post_activities():
             return send_json_msg(NOT_SUPPORTED, 406, APPLICATION_JSON)
         #  if there's a valid jwt only show user's JWT including private activities
         if 'Authorization' not in request.headers.keys():
-            return get_activities_paginated(None, None)
+            return get_activities_paginated(True, None)
         else:
             payload = verify_jwt(request)
             if type(payload) is not dict:
-                return get_activities_paginated(None, None)
+                return get_activities_paginated(True, None)
             else:
-                return get_activities_paginated(True, payload[SUB])
-
-
+                return get_activities_paginated(False, payload[SUB])
 
     else:
-        return 'Method Not Recognized'
+        res = make_response(json.dumps({"Error": "Method not recognized"}))
+        res.mimetype = 'application/json'
+        res.status_code = 405
+        res.headers.set("Allow", "POST, GET")
+        return res
 
 
 @bp.route('/<id>', methods=['PUT', 'PATCH', 'DELETE', 'GET'])
-def put_patch_delete_get_activity():
+def put_patch_delete_get_activity(id):
     if request.method == 'GET':
         if 'application/json' not in request.accept_mimetypes:
             return send_json_msg(NOT_SUPPORTED, 406, APPLICATION_JSON)
@@ -132,7 +131,8 @@ def put_patch_delete_get_activity():
                 return send_json_msg(activity_item, 200, APPLICATION_JSON)
             else:
                 return send_json_msg(INVALID_ACTIVITY_ID, 404, APPLICATION_JSON)
-
+    elif request.method == 'DELETE':
+        return 0
     else:
         res = make_response(json.dumps({"Error": "Method not recognized"}))
         res.mimetype = 'application/json'
@@ -141,22 +141,20 @@ def put_patch_delete_get_activity():
         return res
 
 
-
-
 def get_activities_paginated(public: bool, user):
     #   return public activities
     query_all = client.query(kind=ACTIVITIES)
-    # query_all.order=[START]
-    if public:
+
+    if public is True:
+        query_all.add_filter(PUBLIC, "=", True)
+    if user:
         query_all.add_filter(INSTRUCTOR, "=", user)
-    query_all.add_filter(PUBLIC, "=", True)
     results_no_pagination = list(query_all.fetch())
     num_activities = len(results_no_pagination)
     # add pagination
     q_limit = int(request.args.get('limit', 5))
     q_offset = int(request.args.get("offset", 0))
     page_iterator = query_all.fetch(limit=q_limit, offset=q_offset)
-    page_iterator.order = [START]
     pages = page_iterator.pages
     results = list(next(pages))
     data_to_send = {}
@@ -182,4 +180,3 @@ def get_activities_paginated(public: bool, user):
     data_to_send[ACTIVITIES] = results
 
     return send_json_msg(data_to_send, 200, APPLICATION_JSON)
-
