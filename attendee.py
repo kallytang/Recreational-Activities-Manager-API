@@ -127,14 +127,29 @@ def put_delete_get_attendee(id):
             # request.url_root + "attendee/" + id
             return send_json_msg(attendee_item, 200, APPLICATION_JSON)
     elif request.method == 'DELETE':
+        if 'Authorization' not in request.headers.keys():
+            return jsonify(MISSING_TOKEN), 401
+
+        payload = verify_jwt(request)
+        if type(payload) is not dict:
+            return payload
+
         # first check if item exists
         attendee_key = client.key(ATTENDEES, int(id))
         attendee_item = client.get(key=attendee_key)
+
         if attendee_item is None:
             return send_json_msg(INVALID_ATTENDEE_ID, 404, APPLICATION_JSON)
 
         #     check if there's a list of classes that the attendee has taken
-        return 0
+        if ACTIVITY_LIST not in attendee_item.keys():
+            client.delete(attendee_key)
+
+        # if the attendee has more than two classes attending then return an error that user must be removed from
+        # classes
+        if len(client[ACTIVITY_LIST]) > 2:
+            return send_json_msg(MULTIPLE_CLASSES, 400, APPLICATION_JSON)
+
     else:
         res = make_response(json.dumps({"Error": "Method not recognized"}))
         res.mimetype = 'application/json'

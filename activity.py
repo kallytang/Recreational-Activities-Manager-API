@@ -6,6 +6,7 @@ from error_msg_helper import *
 from helper_functions import *
 from auth_helper import *
 from google.cloud import datastore
+import attendee
 
 bp = Blueprint('activities', __name__, url_prefix='/activities')
 
@@ -113,27 +114,165 @@ def put_patch_delete_get_activity(id):
         if 'application/json' not in request.accept_mimetypes:
             return send_json_msg(NOT_SUPPORTED, 406, APPLICATION_JSON)
         else:
-
             activity_key = client.key(ACTIVITIES, int(id))
             activity_item = client.get(key=activity_key)
 
-            # check if the activity exists
-            if activity_item is not None:
-                # if user attempts to access an activity that is private without at token, return a 403 error message
-                if 'Authorization' not in request.headers.keys() and activity_item[PUBLIC] is False:
-                    return send_json_msg(ERR_PRIVATE_ACTIVITY, 403)
-
-                payload = verify_jwt(request)
-                if type(payload) is not dict and activity_item[PUBLIC] is False:
-                    return send_json_msg(ERR_PRIVATE_ACTIVITY, 403)
-                activity_item["id"] = str(activity_key.id)
-                activity_item["self"] = request.url + "/" + str(activity_item.key.id)
-                return send_json_msg(activity_item, 200, APPLICATION_JSON)
-            else:
+            if activity_item is None:
                 return send_json_msg(INVALID_ACTIVITY_ID, 404, APPLICATION_JSON)
+
+            activity_item["id"] = str(activity_key.id)
+            activity_item["self"] = request.url
+            if ATTENDEE_LIST in  activity_item.keys():
+                if len(activity_item[ATTENDEE_LIST]) > 0:
+                    for item in activity_item[ATTENDEE_LIST]:
+                        item["self"] = request.url_root + "attendees/" + item[ATTENDEE_ID]
+
+            # todo  add list of attendee info
+            if activity_item[PUBLIC] is False:
+                if 'Authorization' not in request.headers.keys():
+                    return send_json_msg(ERR_PRIVATE_ACTIVITY, 403)
+                else:
+                    payload = verify_jwt(request)
+                    if type(payload) is not dict:
+                        return send_json_msg(ERR_PRIVATE_ACTIVITY, 403)
+                    if payload[SUB] != activity_item[INSTRUCTOR]:
+                        return send_json_msg(ERR_PRIVATE_ACTIVITY, 403)
+
+            return send_json_msg(activity_item, 200, APPLICATION_JSON)
+
     elif request.method == 'DELETE':
-        return 0
+        if 'Authorization' not in request.headers.keys():
+            return jsonify(MISSING_TOKEN), 401
+
+        payload = verify_jwt(request)
+        if type(payload) is not dict:
+            return payload
+
+        activity_key = client.key(ACTIVITIES, int(id))
+        activity_item = client.get(key=activity_key)
+        if activity_item is None:
+            return send_json_msg(INVALID_ACTIVITY_ID, 404, APPLICATION_JSON)
+
+        # check if the activity is associated with client id
+        if payload[SUB] != activity_item[INSTRUCTOR]:
+            return send_json_msg(ACTIVITY_WRONG_USER, 403, APPLICATION_JSON)
+        #  if no attendees, delete the activity
+        if ALL_ATTENDEES not in activity_item.keys():
+            client.delete(activity_key)
+            return '', 204
+
     else:
+        res = make_response(json.dumps({"Error": "Method not recognized"}))
+        res.mimetype = 'application/json'
+        res.status_code = 405
+        res.headers.set("Allow", "PUT, PATCH, DELETE, GET")
+        return res
+
+
+@bp.route('/<activity_id>/attendees/<attendee_id>', methods=['PUT', 'PATCH', 'DELETE', 'GET'])
+def add_remove_attendee(activity_id, attendee_id):
+    if request.method == 'PUT':
+        if 'Authorization' not in request.headers.keys():
+            return jsonify(MISSING_TOKEN), 401
+        else:
+            payload = verify_jwt(request)
+            if type(payload) is not dict:
+                return payload
+
+            if 'application/json' not in request.accept_mimetypes:
+                return send_json_msg(NOT_SUPPORTED, 406, APPLICATION_JSON)
+
+            activity_key = client.key(ACTIVITIES, int(activity_id))
+            activity_item = client.get(key=activity_key)
+            attendee_key = client.key(ATTENDEES, int(attendee_id))
+            attendee_item = client.get(key=attendee_key)
+            # if activity and/or attendee does not exist, send an error message
+            if attendee_item is None or activity_item is None:
+                print(attendee_item)
+                print(activity_item)
+                send_json_msg(INVALID_ATTENDEE_ACTIVITY_ID, 404, APPLICATION_JSON)
+
+            # check if user is authorized to make changes to this class
+            if payload[SUB] != activity_item[INSTRUCTOR]:
+                send_json_msg(UNAUTH_TO_ADD, 403, APPLICATION_JSON)
+
+
+            # add activity id to attendee list of activities_list
+            if ACTIVITY_LIST not in attendee_item.keys():
+                attendee_item[ACTIVITY_LIST] = [{ACTIVITY_ID: activity_id,
+                                                 NAME: activity_item[NAME]}]
+            else:
+                # check if activity already exists with attendee
+                if len(attendee[ACTIVITY_LIST]) > 0:
+                    for items in attendee[ACTIVITY_LIST]:
+                        if activity_id == attendee_id[ACTIVITY_ID]:
+                            return send_json_msg(ATTENDEE_ALREADY_EXISTS, 403, APPLICATION_JSON)
+
+                attendee_id[ACTIVITY_LIST].append({ACTIVITY_ID: activity_id,
+                                                   NAME: activity_item[NAME]})
+
+            #  add attendee to activity list
+            if ATTENDEE_LIST not in attendee_item.keys():
+                activity_item[ATTENDEE_LIST] = [{ATTENDEE_ID: attendee_id}]
+
+            else:
+                activity_item[ATTENDEE_LIST].append({ATTENDEE_ID: attendee_id})
+
+            # store change in datastore
+            client.put(activity_item)
+            client.put(attendee_item)
+            return "", 204
+    # removing attendee from activity
+    elif request.method == 'DELETE':
+        if 'Authorization' not in request.headers.keys():
+            return jsonify(MISSING_TOKEN), 401
+        else:
+            payload = verify_jwt(request)
+            if type(payload) is not dict:
+                return payload
+
+            if 'application/json' not in request.accept_mimetypes:
+                return send_json_msg(NOT_SUPPORTED, 406, APPLICATION_JSON)
+
+            activity_key = client.key(ACTIVITIES, int(activity_id))
+            activity_item = client.get(key=activity_key)
+            attendee_key = client.key(ATTENDEES, int(attendee_id))
+            attendee_item = client.get(key=attendee_key)
+            # if activity and/or attendee does not exist, send an error message
+            if attendee_item is None or activity_item is None:
+                print(attendee_item)
+                print(activity_item)
+                send_json_msg(INVALID_ATTENDEE_ACTIVITY_ID, 404, APPLICATION_JSON)
+
+            # check if user is authorized to make changes to this class
+            if payload[SUB] != activity_item[INSTRUCTOR]:
+                send_json_msg(UNAUTH_TO_ADD, 403, APPLICATION_JSON)
+
+            if ACTIVITY_LIST not in attendee_item.keys():
+                send_json_msg(ATTENDEE_NOT_IN_ACTIVITY, 403, APPLICATION_JSON)
+
+            else:
+                was_registered = False
+                # find if the attendee exists
+                for i in range(len(activity_item[ATTENDEE_LIST])):
+                    was_registered = True
+                    if activity_item[ATTENDEE_LIST][i][ATTENDEE_ID] == attendee_id:
+                        activity_item[ATTENDEE_LIST].pop(i)
+                        #  remove the activity from the attendee
+                        for idx in range(len(attendee_item[ACTIVITY_LIST])):
+                            if attendee_item[ACTIVITY_LIST][idx][ACTIVITY_ID] == activity_id:
+                                attendee_item[ACTIVITY_LIST].pop(idx)
+                        #  update items
+                        client.put(attendee_item)
+                        client.put(activity_item)
+
+                if was_registered:
+                    return "", 204
+                else:
+                    return send_json_msg(ATTENDEE_NOT_IN_ACTIVITY, 403, APPLICATION_JSON)
+
+    else:
+
         res = make_response(json.dumps({"Error": "Method not recognized"}))
         res.mimetype = 'application/json'
         res.status_code = 405
@@ -172,8 +311,8 @@ def get_activities_paginated(public: bool, user):
         return jsonify(results)
 
     for item in results:
-        if ATTENDEES in item.keys():
-            item[NUM_ATTENDEES] = len(item[ATTENDEES])
+        if ATTENDEE_LIST in item.keys():
+            item[NUM_ATTENDEES] = len(item[NUM_ATTENDEES])
         item["id"] = str(item.key.id)
         item["self"] = request.url + "/" + str(item.key.id)
 
