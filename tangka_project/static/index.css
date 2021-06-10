@@ -1,0 +1,15 @@
+#form_sign_in {
+    width: 500px;
+    padding-top: 30px;
+    text-align: left;
+}
+
+body {
+    padding: 100px;
+}
+#sign_in_header{
+    padding-top: 20px;
+}
+#header_to_sign_up{
+    padding-top: 30px;
+}

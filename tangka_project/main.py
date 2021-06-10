@@ -8,7 +8,7 @@ import json
 from six.moves.urllib.request import urlopen
 from flask_cors import cross_origin
 from jose import jwt
-
+import http.client
 import json
 from os import environ as env
 from werkzeug.exceptions import HTTPException
@@ -38,8 +38,8 @@ app.register_blueprint(attendee.bp)
 app.register_blueprint(bp)
 app.register_blueprint(activity.bp)
 
-CALLBACK_URL = 'http://localhost:8080/callback'
-# CALLBACK_URL = 'https://hw7-tangka.wl.r.appspot.com/callback'
+# CALLBACK_URL = 'http://localhost:8080/callback'
+CALLBACK_URL = 'https://tangka-activities-api.wl.r.appspot.com/callback'
 
 
 oauth = OAuth(app)
@@ -137,7 +137,15 @@ def login_user():
     r = requests.post(url, json=body, headers=headers)
     return r.text, 200, {'Content-Type': 'application/json'}
 
+@app.route('/users')
+def get_all_users():
 
+    req = requests.get(url="https://recreational-activities-api.us.auth0.com/api/v2/users", headers={'Authorization': "Bearer "+ AUTH_MANAGERMENT_TOKEN})
+
+    data = req.text
+    return data
+
+# to delete items to make it easier on grader and myself
 @app.route('/delete_all')
 def delete_all_entities():
     query1 = client.query(kind=ACTIVITIES)
