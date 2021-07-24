@@ -1,0 +1,6243 @@
+{
+	"info": {
+		"_postman_id": "84c9e667-2769-40a9-b763-58bbfc207fd8",
+		"name": "tangka_project",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "login user_1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"jwt1\", pm.response.json()[\"id_token\"])\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"k.tang.1993@gmail.com\",\r\n    \"password\": \"Food123@@\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/login",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "login user_2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"jwt2\", pm.response.json()[\"id_token\"])\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"username\": \"tangka@oregonstate.edu\",\r\n    \"password\": \"abc123@@\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/login",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "1. 201 Create an Activity-- activity_01 w/ user_1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"user_id1\", pm.response.json()[\"instructor\"])\r",
+							"\r",
+							"\r",
+							"pm.test(\"201 status code\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// store activity id \r",
+							"pm.environment.set(\"activity_01\", pm.response.json()[\"id\"])\r",
+							"\r",
+							"pm.test(\"content is valid\", function () {\r",
+							"    pm.expect(pm.response.json()[\"name\"]).to.eq(\"Bingo Night\");\r",
+							"    pm.expect(pm.response.json()[\"description\"]).to.eq(\"Senior care bingo night, with prizes\");\r",
+							"    pm.expect(pm.response.json()[\"start\"]).to.eq(1622582557);\r",
+							"    pm.expect(pm.response.json()[\"end\"]).to.eq(1622584837);\r",
+							"    pm.expect(pm.response.json()[\"room\"]).to.eq(200);\r",
+							"   pm.expect(pm.response.json()[\"instructor\"]).to.eq(pm.environment.get(\"user_id1\"));\r",
+							"    pm.expect(pm.response.json()[\"public\"]).to.eq(true);\r",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/activities/\" + pm.response.json()[\"id\"];\r",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Bingo Night\",\r\n    \"room\": 200, \r\n    \"start\": 1622582557,\r\n    \"end\" :1622584837,\r\n    \"description\": \"Senior care bingo night, with prizes\",\r\n    \"public\": true\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "2. 200 Get activity_01(public) with user_01 auth token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"content is valid\", function () {\r",
+							"    pm.expect(pm.response.json()[\"name\"]).to.eq(\"Bingo Night\");\r",
+							"    pm.expect(pm.response.json()[\"description\"]).to.eq(\"Senior care bingo night, with prizes\");\r",
+							"    pm.expect(pm.response.json()[\"start\"]).to.eq(1622582557);\r",
+							"    pm.expect(pm.response.json()[\"end\"]).to.eq(1622584837);\r",
+							"    pm.expect(pm.response.json()[\"room\"]).to.eq(200);\r",
+							"   pm.expect(pm.response.json()[\"instructor\"]).to.eq(pm.environment.get(\"user_id1\"));\r",
+							"    pm.expect(pm.response.json()[\"public\"]).to.eq(true);\r",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/activities/\" + pm.response.json()[\"id\"];\r",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);\r",
+							"    pm.expect(pm.response.json()[\"id\"]).to.eq(pm.environment.get(\"activity_01\"))\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "3. 200 Get activity_01(public) with user_02",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"content is valid\", function () {\r",
+							"    pm.expect(pm.response.json()[\"name\"]).to.eq(\"Bingo Night\");\r",
+							"    pm.expect(pm.response.json()[\"description\"]).to.eq(\"Senior care bingo night, with prizes\");\r",
+							"    pm.expect(pm.response.json()[\"start\"]).to.eq(1622582557);\r",
+							"    pm.expect(pm.response.json()[\"end\"]).to.eq(1622584837);\r",
+							"    pm.expect(pm.response.json()[\"room\"]).to.eq(200);\r",
+							"   pm.expect(pm.response.json()[\"instructor\"]).to.eq(pm.environment.get(\"user_id1\"));\r",
+							"    pm.expect(pm.response.json()[\"public\"]).to.eq(true);\r",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/activities/\" + pm.response.json()[\"id\"];\r",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);\r",
+							"    pm.expect(pm.response.json()[\"id\"]).to.eq(pm.environment.get(\"activity_01\"))\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "4. 200 Get activity_01(no auth)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"content is valid\", function () {\r",
+							"    pm.expect(pm.response.json()[\"name\"]).to.eq(\"Bingo Night\");\r",
+							"    pm.expect(pm.response.json()[\"description\"]).to.eq(\"Senior care bingo night, with prizes\");\r",
+							"    pm.expect(pm.response.json()[\"start\"]).to.eq(1622582557);\r",
+							"    pm.expect(pm.response.json()[\"end\"]).to.eq(1622584837);\r",
+							"    pm.expect(pm.response.json()[\"room\"]).to.eq(200);\r",
+							"   pm.expect(pm.response.json()[\"instructor\"]).to.eq(pm.environment.get(\"user_id1\"));\r",
+							"    pm.expect(pm.response.json()[\"public\"]).to.eq(true);\r",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/activities/\" + pm.response.json()[\"id\"];\r",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);\r",
+							"    pm.expect(pm.response.json()[\"id\"]).to.eq(pm.environment.get(\"activity_01\"))\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "5. Get public activity with invalid token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"content is valid\", function () {\r",
+							"    pm.expect(pm.response.json()[\"name\"]).to.eq(\"Bingo Night\");\r",
+							"    pm.expect(pm.response.json()[\"description\"]).to.eq(\"Senior care bingo night, with prizes\");\r",
+							"    pm.expect(pm.response.json()[\"start\"]).to.eq(1622582557);\r",
+							"    pm.expect(pm.response.json()[\"end\"]).to.eq(1622584837);\r",
+							"    pm.expect(pm.response.json()[\"room\"]).to.eq(200);\r",
+							"   pm.expect(pm.response.json()[\"instructor\"]).to.eq(pm.environment.get(\"user_id1\"));\r",
+							"    pm.expect(pm.response.json()[\"public\"]).to.eq(true);\r",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/activities/\" + pm.response.json()[\"id\"];\r",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);\r",
+							"    pm.expect(pm.response.json()[\"id\"]).to.eq(pm.environment.get(\"activity_01\"))\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{invalid_token}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "6. 404 Get invalid activity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(404)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{invalid_activity_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{invalid_activity_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "7. 201 Create activity_02 w/ user_1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.environment.set(\"user_id2\", pm.response.json()[\"instructor\"])\r",
+							"\r",
+							"pm.test(\"201 status code\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.environment.set(\"activity_02\", pm.response.json()[\"id\"])\r",
+							"pm.test(\"Content is valid\", function () {\r",
+							"    pm.expect(pm.response.json()[\"name\"]).to.eq(\"Knitting Club Meet Up\");\r",
+							"    pm.expect(pm.response.json()[\"description\"]).to.eq(\"No knowledge of knitting is required.\");\r",
+							"    pm.expect(pm.response.json()[\"start\"]).to.eq(1622638837);\r",
+							"    pm.expect(pm.response.json()[\"end\"]).to.eq(1622674837);\r",
+							"    pm.expect(pm.response.json()[\"room\"]).to.eq(100);\r",
+							"    pm.expect(pm.response.json()[\"public\"]).to.eq(true);\r",
+							"    pm.expect(pm.response.json()[\"instructor\"]).to.eq(pm.environment.get(\"user_id1\"));\r",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/activities/\" + pm.response.json()[\"id\"];\r",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Knitting Club Meet Up\",\r\n    \"room\": 100, \r\n    \"public\": true,\r\n    \"start\": 1622638837,\r\n    \"end\" : 1622674837,\r\n    \"description\": \"No knowledge of knitting is required.\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "8. 201 Create activity_03 w/ user_1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"201 status code\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.environment.set(\"activity_03\", pm.response.json()[\"id\"])\r",
+							"\r",
+							"pm.test(\"Content is valid\", function () {\r",
+							"    pm.expect(pm.response.json()[\"name\"]).to.eq(\"Senior Movie Night\");\r",
+							"    pm.expect(pm.response.json()[\"description\"]).to.eq(\"Senior care movie night.\");\r",
+							"    pm.expect(pm.response.json()[\"start\"]).to.eq(1622698131);\r",
+							"    pm.expect(pm.response.json()[\"end\"]).to.eq(1622701731);\r",
+							"    pm.expect(pm.response.json()[\"public\"]).to.eq(true);\r",
+							"    pm.expect(pm.response.json()[\"room\"]).to.eq(100);\r",
+							"    pm.expect(pm.response.json()[\"instructor\"]).to.eq(pm.environment.get(\"user_id1\"));\r",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/activities/\" + pm.response.json()[\"id\"];\r",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Senior Movie Night\",\r\n    \"room\": 100, \r\n    \"public\": true,\r\n    \"start\": 1622698131,\r\n    \"end\" : 1622701731,\r\n    \"description\": \"Senior care movie night.\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "9. 201 Create activity_04 w/ user_1 that's private",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"201 status code\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.environment.set(\"activity_04\", pm.response.json()[\"id\"])\r",
+							"\r",
+							"pm.test(\"Content is valid\", function () {\r",
+							"    pm.expect(pm.response.json()[\"name\"]).to.eq(\"Couple's Movie Night\");\r",
+							"    pm.expect(pm.response.json()[\"description\"]).to.eq(\"Couple's movie night.\");\r",
+							"    pm.expect(pm.response.json()[\"start\"]).to.eq(1622698131);\r",
+							"    pm.expect(pm.response.json()[\"end\"]).to.eq(1622701731);\r",
+							"    pm.expect(pm.response.json()[\"public\"]).to.eq(false);\r",
+							"    pm.expect(pm.response.json()[\"room\"]).to.eq(1);\r",
+							"    pm.expect(pm.response.json()[\"instructor\"]).to.eq(pm.environment.get(\"user_id1\"));\r",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/activities/\" + pm.response.json()[\"id\"];\r",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Couple's Movie Night\",\r\n    \"room\": 1, \r\n    \"public\": false,\r\n    \"start\": 1622698131,\r\n    \"end\" : 1622701731,\r\n    \"description\": \"Couple's movie night.\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "10. 401 Get activity_04(no auth)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"401 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(401)\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_04}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_04}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "11. 403 Get activity_04 with jwt2 token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"403 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(403)\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_04}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_04}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "12. 401 Get activity_04 with invalid token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"401 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(401)\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_04}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_04}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "13. 200 Get activity_04 with user_1 token Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_04}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_04}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "14. 201 Create activity_05 w/ user_2 that's private Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"201 status code\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.environment.set(\"activity_05\", pm.response.json()[\"id\"])\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Macrame Morning Class\",\r\n    \"room\": 300, \r\n    \"public\": true,\r\n    \"start\": 1623734775,\r\n    \"end\" : 1623738375,\r\n    \"description\": \"Beginners welcome!\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "15. 201 Create activity_06 w/ user_2 that's",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"201 status code\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.environment.set(\"activity_06\", pm.response.json()[\"id\"])\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Kids's Movie Night\",\r\n    \"room\": 33, \r\n    \"public\": true,\r\n    \"start\": 1622698131,\r\n    \"end\" : 1622701731,\r\n    \"description\": \"Disney movies week.\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get activity_01(no auth) Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"content is valid\", function () {\r",
+							"    pm.expect(pm.response.json()[\"name\"]).to.eq(\"Bingo Night\");\r",
+							"    pm.expect(pm.response.json()[\"description\"]).to.eq(\"Senior care bingo night, with prizes\");\r",
+							"    pm.expect(pm.response.json()[\"start\"]).to.eq(1622582557);\r",
+							"    pm.expect(pm.response.json()[\"end\"]).to.eq(1622584837);\r",
+							"    pm.expect(pm.response.json()[\"room\"]).to.eq(200);\r",
+							"   pm.expect(pm.response.json()[\"instructor\"]).to.eq(pm.environment.get(\"user_id1\"));\r",
+							"    pm.expect(pm.response.json()[\"public\"]).to.eq(true);\r",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/activities/\" + pm.response.json()[\"id\"];\r",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);\r",
+							"    pm.expect(pm.response.json()[\"id\"]).to.eq(pm.environment.get(\"activity_01\"))\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "201 Create activity_07 w/ user_2 that's private Copy 3",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"201 status code\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.environment.set(\"activity_07\", pm.response.json()[\"id\"])\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Couple's Movie Night II\",\r\n    \"room\": 120, \r\n    \"public\": false,\r\n    \"start\": 1622698131,\r\n    \"end\" : 1622701731,\r\n    \"description\": \"Scary movie night.\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "201 Create activity_08 w/ user_2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"201 status code\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"pm.environment.set(\"activity_08\", pm.response.json()[\"id\"])\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Birthday Party\",\r\n    \"room\": 89, \r\n    \"public\": true,\r\n    \"start\": 1622698131,\r\n    \"end\" : 1622701731,\r\n    \"description\": \"Birthday party.\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "403 Create an Activity , with same start and end time and room  as an exisiting activity entity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"403 status code\", function () {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"403 error message\", function () {\r",
+							"     pm.expect(pm.response.json()[\"Error\"]).to.eq(\"The time overlaps with another activity. Please choose a different time.\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Bingo Night II\",\r\n    \"room\": 200, \r\n    \"start\": 1622582557,\r\n    \"end\" :1622584837,\r\n    \"description\": \"Senior care bingo night, with prizes\",\r\n    \"public\": true\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "400 Create an Activity with missing field",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"400 status code\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"400 error message\", function () {\r",
+							"     pm.expect(pm.response.json()[\"Error\"]).to.eq(\"The request object is missing at least one of the required attributes.\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Bingo Night II\",\r\n    \"room\": 200, \r\n    \"start\": 1622582557,\r\n    \"description\": \"Senior care bingo night, with prizes\",\r\n    \"public\": true\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "400 Create an Activity with extra attribute",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"400 status code\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"400 error message\", function () {\r",
+							"     pm.expect(pm.response.json()[\"Error\"]).to.eq(\"The request object has at least one attribute that is not allowed\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Bingo Night II\",\r\n    \"room\": 200, \r\n    \"start\": 1622584837,\r\n    \"end\" :1622784837,\r\n    \"description\": \"Senior care bingo night, with prizes\",\r\n    \"public\": true,\r\n    \"attendee\": 1\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "403 Create an Activity out of range edge case room 0",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"403 status code\", function () {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"403 error message\", function () {\r",
+							"     pm.expect(pm.response.json()[\"Error\"]).to.eq(\"The room number is invalid, must range between 1-300 inclusively.\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Senior Movie Night\",\r\n    \"room\": 0, \r\n    \"public\": true,\r\n    \"start\": 1622698131,\r\n    \"end\" : 1622701731,\r\n    \"description\": \"Senior care movie night.\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "403 Create an Activity with out of range edge case(room 301)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"403 status code\", function () {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"403 error message\", function () {\r",
+							"     pm.expect(pm.response.json()[\"Error\"]).to.eq(\"The room number is invalid, must range between 1-300 inclusively.\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Kids Movie Night\",\r\n    \"room\": 301, \r\n    \"public\": true,\r\n    \"start\": 1622698131,\r\n    \"end\" : 1622701731,\r\n    \"description\": \"Senior care movie night.\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "401 - Created an activity without an auth token (jwt)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"401 status code\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"403 error message\", function () {\r",
+							"     pm.expect(pm.response.json()[\"Error\"]).to.eq(\"Missing Authorization token.\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Senior Movie Night\",\r\n    \"room\": 100, \r\n    \"public\": true,\r\n    \"start\": 1622698131,\r\n    \"end\" : 1622701731,\r\n    \"description\": \"Senior care movie night.\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "406- Created an activity with Accept header not application/json",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"406 status code\", function () {\r",
+							"    pm.response.to.have.status(406);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"406 error message\", function () {\r",
+							"     pm.expect(pm.response.json()[\"Error\"]).to.eq(\"Content type requested is not supported by API.\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/html",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Senior Movie Night\",\r\n    \"room\": 100, \r\n    \"public\": true,\r\n    \"start\": 1622698131,\r\n    \"end\" : 1622701731,\r\n    \"description\": \"Senior care movie night.\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "415- Created an activity sending data that is not application json",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"415 status code\", function () {\r",
+							"    pm.response.to.have.status(415);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"415 error message\", function () {\r",
+							"     pm.expect(pm.response.json()[\"Error\"]).to.eq(\"Unsupported Media Type\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Senior Movie Night\",\r\n    \"room\": 100, \r\n    \"public\": true,\r\n    \"start\": 1622698131,\r\n    \"end\" : 1622701731,\r\n    \"description\": \"Senior care movie night.\"\r\n\r\n}",
+					"options": {
+						"raw": {
+							"language": "html"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Get all Activities, no auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Get all Activities, no auth with limit and offset",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities?limit=3&offset=1",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					],
+					"query": [
+						{
+							"key": "limit",
+							"value": "3"
+						},
+						{
+							"key": "offset",
+							"value": "1"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Get all user_id1 activities with user_1 token to view all activities created by user",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Confirm num of activities should be 4 \", function(){\r",
+							"    pm.expect(pm.response.json()[\"activities\"].length).to.eq(4)\r",
+							"    pm.expect(pm.response.json()[\"count\"]).to.eq(4)\r",
+							"  \r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "201 Create attendee_01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"\r",
+							"pm.test(\"201 status code\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// store activity id \r",
+							"pm.environment.set(\"attendee_01\", pm.response.json()[\"id\"])\r",
+							"\r",
+							"pm.test(\"content is valid\", function () {\r",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"Jane\");\r",
+							"    pm.expect(pm.response.json()[\"last_name\"]).to.eq(\"Doe\");\r",
+							"    pm.expect(pm.response.json()[\"email\"]).to.eq(\"janedoe@gmail.com\");\r",
+							"    pm.expect(pm.response.json()[\"phone\"]).to.eq(6552302558);\r",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/attendees/\" + pm.response.json()[\"id\"];\r",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Jane\",\r\n    \"last_name\":\"Doe\",\r\n    \"email\":\"janedoe@gmail.com\",\r\n    \"phone\":6552302558\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "201 Create attendee_02",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"201 status code\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// store activity id \r",
+							"pm.environment.set(\"attendee_02\", pm.response.json()[\"id\"])\r",
+							"\r",
+							"pm.test(\"content is valid\", function () {\r",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"John\");\r",
+							"    pm.expect(pm.response.json()[\"last_name\"]).to.eq(\"Doe\");\r",
+							"    pm.expect(pm.response.json()[\"email\"]).to.eq(\"johndoe@esq.com\");\r",
+							"    pm.expect(pm.response.json()[\"phone\"]).to.eq(5558881111);\r",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/attendees/\" + pm.response.json()[\"id\"];\r",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"John\",\r\n    \"last_name\":\"Doe\",\r\n    \"email\":\"johndoe@esq.com\",\r\n    \"phone\":5558881111\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "201 Create an attendee_03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"201 status code\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// store activity id \r",
+							"pm.environment.set(\"attendee_03\", pm.response.json()[\"id\"])\r",
+							"\r",
+							"pm.test(\"content is valid\", function () {\r",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"Sam\");\r",
+							"    pm.expect(pm.response.json()[\"last_name\"]).to.eq(\"Doe\");\r",
+							"    pm.expect(pm.response.json()[\"email\"]).to.eq(\"johndoe@esq.com\");\r",
+							"    pm.expect(pm.response.json()[\"phone\"]).to.eq(6552522254);\r",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/attendees/\" + pm.response.json()[\"id\"];\r",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Sam\",\r\n    \"last_name\":\"Doe\",\r\n    \"email\":\"johndoe@esq.com\",\r\n    \"phone\":6552522254\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "201 Create an attendee_04",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"201 status code\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// store activity id \r",
+							"pm.environment.set(\"attendee_04\", pm.response.json()[\"id\"])\r",
+							"\r",
+							"pm.test(\"content is valid\", function () {\r",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"Jake\");\r",
+							"    pm.expect(pm.response.json()[\"last_name\"]).to.eq(\"Doe\");\r",
+							"    pm.expect(pm.response.json()[\"email\"]).to.eq(\"johndoe@esq.com\");\r",
+							"    pm.expect(pm.response.json()[\"phone\"]).to.eq(6552522254);\r",
+							"    const self_url = pm.environment.get(\"app_url\") + \"/attendees/\" + pm.response.json()[\"id\"];\r",
+							"    pm.expect(pm.response.json()[\"self\"]).to.eq(self_url);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Jake\",\r\n    \"last_name\":\"Doe\",\r\n    \"email\":\"johndoe@esq.com\",\r\n    \"phone\":6552522254\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "201 Create an attendee_05",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"201 status code\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// store activity id \r",
+							"pm.environment.set(\"attendee_05\", pm.response.json()[\"id\"])\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Mary\",\r\n    \"last_name\":\"Day\",\r\n    \"email\":\"maryday@esq.com\",\r\n    \"phone\":6553333541\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "201 Create an attendee_06",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"201 status code\", function () {\r",
+							"    pm.response.to.have.status(201);\r",
+							"});\r",
+							"\r",
+							"// store activity id \r",
+							"pm.environment.set(\"attendee_06\", pm.response.json()[\"id\"])\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Joy\",\r\n    \"last_name\":\"Day\",\r\n    \"email\":\"maryday@esq.com\",\r\n    \"phone\":6553333541\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "403 Create duplicate attendee with same fields as attendee_03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"403 status code\", function () {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Sam\",\r\n    \"last_name\":\"Doe\",\r\n    \"email\":\"johndoe@esq.com\",\r\n    \"phone\":6552522254\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "400 Create attendee with missing field",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"\r",
+							"\r",
+							"pm.test(\"400 status code\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Sam\",\r\n    \r\n    \"email\":\"johndoe@esq.com\",\r\n    \"phone\":6552522254\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "400 Create duplicate attendee with extra field",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"\r",
+							"\r",
+							"pm.test(\"400 status code\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Sam\",\r\n    \"last_name\":\"Dory\",\r\n    \"email\":\"johndoe@esq.com\",\r\n    \"phone\":6552522254,\r\n    \"age\": 33\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "401 Create create attendee with no auth token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"401 status code\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Sam\",\r\n    \"last_name\":\"Dory\",\r\n    \"email\":\"samdory@gmail.com\",\r\n    \"phone\":6532522254\r\n}",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "406 Create create attendee with Accept header not application/json",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"\r",
+							"pm.test(\"406 status code\", function () {\r",
+							"    pm.response.to.have.status(406);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"406 error message\", function () {\r",
+							"     pm.expect(pm.response.json()[\"Error\"]).to.eq(\"Content type requested is not supported by API.\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "text/plain",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Sam\",\r\n    \"last_name\":\"Dory\",\r\n    \"email\":\"samdory@gmail.com\",\r\n    \"phone\":6532522254\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "415 Create create attendee with invalid request body type",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"\r",
+							"\r",
+							"pm.test(\"415 status code\", function () {\r",
+							"    pm.response.to.have.status(415);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"415 error message\", function () {\r",
+							"     pm.expect(pm.response.json()[\"Error\"]).to.eq(\"Unsupported Media Type\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Sam\",\r\n    \"last_name\":\"Dory\",\r\n    \"email\":\"samdory@gmail.com\",\r\n    \"phone\":6532522254\r\n}",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Get all Attendees",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"url": {
+					"raw": "{{app_url}}/attendees",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Get all Attendees with offset and limit",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Confirm number of items in list of attendees is 2 \", function(){\r",
+							"    pm.expect(pm.response.json()[\"attendees\"].length).to.eq(2);\r",
+							"   \r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees?offset=1&limit=2",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees"
+					],
+					"query": [
+						{
+							"key": "offset",
+							"value": "1"
+						},
+						{
+							"key": "limit",
+							"value": "2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "405 Send a PUT request on attendees",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"405 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(405)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "405 Send a PUT request on activities Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"405 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(405)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "403 Assign attendee_01 to activity_01 jwt2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"403 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(403)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}/attendees/{{attendee_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}",
+						"attendees",
+						"{{attendee_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 Assign attendee_01 to activity_01 Copy 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(204)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}/attendees/{{attendee_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}",
+						"attendees",
+						"{{attendee_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get activity_01 after assigning attendee_01 to activity Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Confirm attendee has been added \", function(){\r",
+							"    pm.expect(pm.response.json()[\"attendee_list\"].length).to.eq(1)\r",
+							"    pm.expect(pm.response.json()[\"attendee_list\"][0][\"attendee_id\"]).to.eq(pm.environment.get(\"attendee_01\"))\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get attendee_01 after assigned to activity_01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Confirm activity has been added \", function(){\r",
+							"    pm.expect(pm.response.json()[\"activity_list\"].length).to.eq(1);\r",
+							"    pm.expect(pm.response.json()[\"activity_list\"][0][\"activity_id\"]).to.eq(pm.environment.get(\"activity_01\"));\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 Remove attendee_01 from an activity_01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(204)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}/attendees/{{attendee_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}",
+						"attendees",
+						"{{attendee_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "403 Remove attendee_01 from activity_01 with jwt2 token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"403 status code\", function () {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"403 error message\", function () {\r",
+							"     pm.expect(pm.response.json()[\"Error\"]).to.eq( \"You are not authorized to add attendees to this activity.\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}/attendees/{{attendee_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}",
+						"attendees",
+						"{{attendee_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "404 Remove invalid_attendee_id to an activity_01 Copy 2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"\r",
+							"pm.test(\"403 status code\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"404 error message\", function () {\r",
+							"     pm.expect(pm.response.json()[\"Error\"]).to.eq( \"No activity with this activity_id exists and/or attendee with this attendee_id.\");\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}/attendees/{{invalid_attendee_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}",
+						"attendees",
+						"{{invalid_attendee_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get activity_01 after removal of activity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Confirm attendee has been removed \", function(){\r",
+							"    pm.expect(pm.response.json()[\"attendee_list\"].length).to.eq(0)\r",
+							" \r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get attendee_01 after assigned to activity_01 Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Confirm activity has been removed \", function(){\r",
+							"    pm.expect(pm.response.json()[\"activity_list\"].length).to.eq(0);\r",
+							"  \r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "404 get invalid attendee",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(404)\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{invalid_attendee_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{invalid_attendee_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "401 Assign attendee_01  an activity_01 no auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"401 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(401)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}/attendees/{{attendee_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}",
+						"attendees",
+						"{{attendee_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 Assign attendee_01 to activity_01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(204)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}/attendees/{{attendee_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}",
+						"attendees",
+						"{{attendee_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "403 Assign attendee_01  to activity_01 (already in activity_01)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"403 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(403)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}/attendees/{{attendee_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}",
+						"attendees",
+						"{{attendee_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "403 Assign attendee_01 to  activity_02 with a different token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"403 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(403)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_02}}/attendees/{{attendee_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_02}}",
+						"attendees",
+						"{{attendee_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "404 Assign attendee_01  an invalid activity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(404)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{invalid_activity_id}}/attendees/{{attendee_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{invalid_activity_id}}",
+						"attendees",
+						"{{attendee_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "404 Assign invalid attendee to activity_02",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(404)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_02}}/attendees/{{invalid_attendee_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_02}}",
+						"attendees",
+						"{{invalid_attendee_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 Assign attendee_02 to activity_01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(204)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}/attendees/{{attendee_02}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}",
+						"attendees",
+						"{{attendee_02}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 Assign attendee_02 to activity_02",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(204)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_02}}/attendees/{{attendee_02}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_02}}",
+						"attendees",
+						"{{attendee_02}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get activity_01 after assigning attendee_01 to activity",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Confirm attendee has been added \", function(){\r",
+							"    pm.expect(pm.response.json()[\"attendee_list\"].length).to.eq(2)\r",
+							"    pm.expect(pm.response.json()[\"num_attendees\"]).to.eq(2)\r",
+							"  \r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get attendee_02 after assigned to activity_01 and activity_02",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Confirm there's two activity lists added \", function(){\r",
+							"    pm.expect(pm.response.json()[\"activity_list\"].length).to.eq(2)\r",
+							"    pm.expect(pm.response.json()[\"num_activities\"]).to.eq(2)\r",
+							"  \r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_02}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_02}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 delete attendee_01 when activity is assigned to it",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(204)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "401 Delete attendee_04 with no auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"401 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(401)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_04}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_04}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "404 Delete invalid attendee with with auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(404)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{invalid_attendee_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{invalid_attendee_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get activity_01 after deleting attendee_01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Confirm attendee has been added \", function(){\r",
+							"    pm.expect(pm.response.json()[\"attendee_list\"].length).to.eq(1)\r",
+							"    pm.expect(pm.response.json()[\"num_attendees\"]).to.eq(1)\r",
+							"  \r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get attendee_02 after assigned to activity Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Confirm attendee has been added \", function(){\r",
+							"    pm.expect(pm.response.json()[\"activity_list\"].length).to.eq(2)\r",
+							"    pm.expect(pm.response.json()[\"num_activities\"]).to.eq(2)\r",
+							"  \r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_02}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_02}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 delete activity_02, with attendee_02 associated with it",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(204)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_02}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_02}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get attendee_02 after activity_02 is deleted",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Confirm that there is now one activity in activity_list \", function(){\r",
+							"    pm.expect(pm.response.json()[\"activity_list\"].length).to.eq(1)\r",
+							"    pm.expect(pm.response.json()[\"num_activities\"]).to.eq(1)\r",
+							"  \r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_02}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_02}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get attendee_03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "404 update an attendee with an invalid attendee id and with auth token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(404)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Samantha\",\r\n    \"last_name\":\"Doe\",\r\n    \"email\":\"samdoe@esq.com\",\r\n    \"phone\":6552522254\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees/{{invalid_attendee_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{invalid_attendee_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "401 update attendee_03 without auth token Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"401 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(401)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Samantha\",\r\n    \"last_name\":\"Doe\",\r\n    \"email\":\"samdoe@esq.com\",\r\n    \"phone\":6552522254\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "400 update attendee_03 with invalid types",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"400 status code\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":111,\r\n    \"last_name\":2,\r\n    \"email\":\"samdoe@esq.com\",\r\n    \"phone\":\"6552522254\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "403 update attendee_03 fields to be same as attendee_04",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"403 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(403)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Jake\",\r\n    \"last_name\":\"Doe\",\r\n    \"email\":\"johndoe@esq.com\",\r\n    \"phone\":6552522254\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "415 update attendee_03 with data that is not html/json",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"415 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(415)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Samantha\",\r\n    \"last_name\":\"Doe\",\r\n    \"email\":\"samdoe@esq.com\",\r\n    \"phone\":6552522254\r\n}",
+					"options": {
+						"raw": {
+							"language": "html"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 change first_name and email of attendee_03 Copy 5",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Samantha\",\r\n    \"last_name\":\"Doe\",\r\n    \"email\":\"samdoe@esq.com\",\r\n    \"phone\":6552522254\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 assign attendee_03 to activity_03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_03}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_03}}",
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get attendee_03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get activity_03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 update attendee_03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Sam\",\r\n    \"last_name\":\"Doe\",\r\n    \"email\":\"johndoe@esq.com\",\r\n    \"phone\":6552522254\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get activity_03(attendee_03 should be removed)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"pm.test(\"Confirm number of attendees is now 0\", function(){\r",
+							"    pm.expect(pm.response.json()[\"num_attendees\"]).to.eq(0);\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get attendee_03(only fields in the update attendee_03 will be in response",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Expect only 6 keys(num_activities and activity_list is not part of object)\", function(){\r",
+							"   pm.expect(Object.keys( pm.response.json()).length).to.eq(6)\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 update activity_03",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 re-assign attendee_03 to activity_03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_03}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_03}}",
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "403 update activity_03 with user_2 token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"403 status code\", function () {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Movie Night\",\r\n    \"description\": \"Families welcome.\",\r\n    \"start\": 1632698131,\r\n    \"end\": 1632701731,\r\n    \"room\": 50,\r\n    \"public\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "401 update activity_03 without token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"401 status code\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Movie Night\",\r\n    \"description\": \"Families welcome.\",\r\n    \"start\": 1632698131,\r\n    \"end\": 1632701731,\r\n    \"room\": 50,\r\n    \"public\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "415 update activity_03 sending text/html",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"415 status code\", function () {\r",
+							"    pm.response.to.have.status(415);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Movie Night\",\r\n    \"description\": \"Families welcome.\",\r\n    \"start\": 1632698131,\r\n    \"end\": 1632701731,\r\n    \"room\": 50,\r\n    \"public\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 update activity_03 Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": \"Movie Night\",\r\n    \"description\": \"Families welcome.\",\r\n    \"start\": 1632698131,\r\n    \"end\": 1632701731,\r\n    \"room\": 50,\r\n    \"public\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get activity_03(attendee_03 should be removed) Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get attendee_03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "400 update activity_03 with invalid types",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"400 status code\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"name\": 6666,\r\n    \"description\": \"Families welcome.\",\r\n    \"start\": \"1632698131\",\r\n    \"end\": \"1632701731\",\r\n    \"room\": 50,\r\n    \"public\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get activity_03 data",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200);\r",
+							"});\r",
+							"pm.test(\"Expect only 9 keys(num_attendees and attendee_list is not part of object)\", function(){\r",
+							"   pm.expect(Object.keys( pm.response.json()).length).to.eq(9)\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "401 update attendee_03 without auth token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"401 status code\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"first_name\": \"Sammy\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "400 update attendee_03 with invalid name type and phone type",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"400 status code\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\": 333,\r\n    \"phone\": \"FF\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "415 update attendee_03 with text body",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"415 status code\", function () {\r",
+							"    pm.response.to.have.status(415);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Mary\",\r\n    \"last_name\":\"Day\",\r\n    \"email\":\"maryday@esq.com\",\r\n    \"phone\":6553333541\r\n}",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "404 update with invalid attendee_id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 status code\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Mary\",\r\n    \"last_name\":\"Day\",\r\n    \"email\":\"maryday@esq.com\",\r\n    \"phone\":6553333541\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees/{{invalid_attendee_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{invalid_attendee_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "403 update attendee_03 with values same as attendee_05 Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"403 status code\", function () {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\":\"Mary\",\r\n    \"last_name\":\"Day\",\r\n    \"email\":\"maryday@esq.com\",\r\n    \"phone\":6553333541\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get attendee_03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Confirm number of activities is now 0\", function(){\r",
+							"    pm.expect(pm.response.json()[\"num_activities\"]).to.eq(0);\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get updated attendee Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Confirm number of activities is  0\", function(){\r",
+							"    pm.expect(pm.response.json()[\"num_activities\"]).to.eq(0);\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 re-assign attendee_03 to activity_03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PUT",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_03}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_03}}",
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get attendee_03",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Confirm number of activities is now 1\", function(){\r",
+							"    pm.expect(pm.response.json()[\"num_activities\"]).to.eq(1);\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 update attendee_03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"first_name\" : \"Eileen R.\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 get updated attendee_03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Confirm number of activities is  still 1\", function(){\r",
+							"    pm.expect(pm.response.json()[\"num_activities\"]).to.eq(1);\r",
+							"})\r",
+							"\r",
+							"pm.test(\"content is valid\", function () {\r",
+							"    pm.expect(pm.response.json()[\"first_name\"]).to.eq(\"Eileen R.\");\r",
+							"    pm.expect(pm.response.json()[\"last_name\"]).to.eq(\"Doe\");\r",
+							"    pm.expect(pm.response.json()[\"email\"]).to.eq(\"johndoe@esq.com\");\r",
+							"    pm.expect(pm.response.json()[\"phone\"]).to.eq(6552522254);\r",
+							"  \r",
+							"\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "400 update activity_01 with invalid data types",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"400 status code\", function () {\r",
+							"    pm.response.to.have.status(400);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"room\": \"20\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "401 update activity_01 with no auth token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"401 status code\", function () {\r",
+							"    pm.response.to.have.status(401);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"room\": \"20\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "403 update activity_01 with same room and start and end as activity_04",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"403 status code\", function () {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"room\": 1,\r\n    \"start\": 1622698131,\r\n    \"end\" : 1622701731\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "403 update activity_01 with jwt2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"403 status code\", function () {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"room\": 1,\r\n    \"start\": 1622698131,\r\n    \"end\" : 1622701731\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "404 update with invalid activity id",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 status code\", function () {\r",
+							"    pm.response.to.have.status(404);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"room\": 1,\r\n    \"start\": 1622698131,\r\n    \"end\" : 1622701731\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities/{{invalid_activity_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{invalid_activity_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "415 update activity_01 with invalid request body type",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"415 status code\", function () {\r",
+							"    pm.response.to.have.status(415);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"room\": \"20\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "text"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Get activity_01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Confirm number of attendees is  still 1\", function(){\r",
+							"    pm.expect(pm.response.json()[\"num_attendees\"]).to.eq(1);\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 update activity_01",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"room\": 222,\r\n    \"description\": \"TBA we will supply more information later\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Get activity_01 Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Confirm number of attendees is  still 1\", function(){\r",
+							"    pm.expect(pm.response.json()[\"num_attendees\"]).to.eq(1);\r",
+							"})\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get all activities",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "403 Delete activity_06 with user_1's token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"403 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(403)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_06}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_06}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "404 Delete invalid activity with auth",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(404)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{invalid_activity_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{invalid_activity_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "401 Delete activity_06 with no token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"401 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(401)\r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_06}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_06}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 Delete activity_08 with jwt2",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_08}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_08}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "403 Delete activity_04 with jwt2 token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"403 status code\", function () {\r",
+							"    pm.response.to.have.status(403);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_04}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_04}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 Delete activity_07 with jwt2 token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_07}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_07}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 Delete activity_06 with jwt2 token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_06}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_06}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 Delete activity_05with jwt2 token Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_05}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_05}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 Delete activity_04 with jwt1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_04}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_04}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "404 get attendee_03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"// check that activity is removed from attendee\r",
+							"pm.test(\"Confirm number of activities is 1\", function(){\r",
+							"    pm.expect(pm.response.json()[\"num_activities\"]).to.eq(1);\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 Delete activity_03 with jwt1",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "404 get attendee_03 Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"404 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							"// check that activity is removed from attendee\r",
+							"pm.test(\"Confirm number of activities is now 0\", function(){\r",
+							"    pm.expect(pm.response.json()[\"num_activities\"]).to.eq(0);\r",
+							"})"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 Delete activity_01 with jwt1 token",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities/{{activity_01}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities",
+						"{{activity_01}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "200 Get all activities (Should be empty)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"200 status code\", function () {\r",
+							"    pm.expect(pm.response.code).to.equal(200)\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/activities",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"activities"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 delete attendee_02",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_02}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_02}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 delete attendee_03",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_03}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_03}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 delete attendee_04",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt2}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_04}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_04}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 delete attendee_05",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_05}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_05}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "204 delete attendee_06",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"204 status code\", function () {\r",
+							"    pm.response.to.have.status(204);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{jwt1}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/attendees/{{attendee_06}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"attendees",
+						"{{attendee_06}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
