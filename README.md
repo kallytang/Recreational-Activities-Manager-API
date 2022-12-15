@@ -1,1 +1,6 @@
-"# Recreational-Activities-Manager-API" 
+#Recreational Activities Manager API
+
+##Introduction 
+
+##Installation
+##Configuration
